@@ -18,7 +18,7 @@ module.exports = {
 				// the second argument for findClosestByPath is an object which takes
 				// a property called filter which can be a function
 				// we use the arrow operator to define it
-				filter: (s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL
+				filter: (s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART
 			});
 
 			// if we find one
@@ -27,7 +27,7 @@ module.exports = {
 					creep.moveTo(structure);
 				}
 			}
-			// if we can't fine one go build
+			// if we can't find one go build
 			else {
 				roleBuilder.run(creep);
 			}
