@@ -5,8 +5,9 @@ ehthumbs.db
 # Folder config file
 Desktop.ini
 
-# autocomplete creeps Iles
+# autocomplete screeps files
 ScreepsAutocomplete/
+.tern-project
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
