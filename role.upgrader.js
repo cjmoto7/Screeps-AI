@@ -29,7 +29,9 @@ else {
 	}
 	else {
 //	Else just pick up dropped energy
-		var droppings = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY);
+		var droppings = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
+			filter: (d) => {return (d.resourceType == RESOURCE_ENERGY)}
+		});
 		if(creep.pickup(droppings) == ERR_NOT_IN_RANGE) {
 			creep.moveTo(droppings);
 		}

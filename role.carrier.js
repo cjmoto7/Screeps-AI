@@ -13,7 +13,9 @@ module.exports = {
 
 		if(!isRoaming) {
 			if(!creep.memory.working) {
-				var droppings = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY);
+				var droppings = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
+					filter: (d) => {return (d.resourceType == RESOURCE_ENERGY)}
+				});
 				if(creep.pickup(droppings) == ERR_NOT_IN_RANGE) {
 					creep.moveTo(droppings);
 				}
@@ -49,7 +51,9 @@ module.exports = {
 						creep.moveTo(Game.flags.second);
 					}
 					else if(creep.room.name = destRoom) {
-						var remoteDroppings = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY);
+						var remoteDroppings = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
+							filter: (d) => {return (d.resourceType == RESOURCE_ENERGY)}
+						});
 						if(creep.pickup(remoteDroppings) == ERR_NOT_IN_RANGE) {
 							creep.moveTo(remoteDroppings);
 						}
