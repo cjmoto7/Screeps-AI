@@ -49,14 +49,16 @@ module.exports.loop = function () {
 	}
 
 	//  Handle repairing and attacking for towers
-	var towers = _.filter(Game.structures, (s) => STRUCTURE_TOWER);
+var goRepair = false;
+
+	var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER);
 	for (let tower of towers) {
 		var closestWounded = tower.pos.findClosestByRange(FIND_MY_CREEPS, {
 			filter: (w) => w.hits < w.hitsMax
 		});
 		var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
 		var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-			filter: (s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL
+			filter: (s) => s.hits < s.hitsMax && s.structureType == STRUCTURE_RAMPART
 		});
 		/*		for (let percentage = 0.0001; percentage <= 1; percentage = percentage + 0.0001){
 		ramparts = tower.pos.findClosestByPath(FIND_STRUCTURES, {
@@ -70,15 +72,15 @@ module.exports.loop = function () {
 	break;
 }
 }*/
-if(closestHostile) {
+if (closestHostile) {
 	tower.attack(closestHostile);
 }
-if ((closestWounded) && (tower.energy > 250)) {
+else if ((closestWounded) && (tower.energy > 250)) {
 	tower.heal(closestWounded);
 }
-/*if ((closestDamagedStructure) && (tower.energy > 990)) {
-tower.repair(closestDamagedStructure);
-}*/
+else if ((closestDamagedStructure) && (tower.energy > 750) && (goRepair)) {
+	tower.repair(closestDamagedStructure);
+}
 }
 
 var harvesters = _.sum(Game.creeps, (creep) => creep.memory.role == 'harvester');
