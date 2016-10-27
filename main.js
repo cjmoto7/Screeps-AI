@@ -8,8 +8,8 @@ var roleCarrier = require('role.carrier');
 
 module.exports.loop = function () {
 
-	var firstRoom = Game.spawns.Spawn1.room.name;
-	var secondRoom = 'E62N61';
+	var firstMainRoom = Game.spawns.Spawn1.room.name;
+	var secondRoom = 'E61N62';
 
 	for (let name in Memory.creeps) {
 		if (Game.creeps[name] == undefined) {
@@ -32,10 +32,13 @@ module.exports.loop = function () {
 			roleCarrier.run(creep);
 		}
 		if(creep.memory.role == 'remoteCarrier') {
-			roleCarrier.run(creep, true, secondRoom, firstRoom);
+			roleCarrier.run(creep, true, secondRoom, firstMainRoom);
 		}
 		if(creep.memory.role == 'upgrader') {
 			roleUpgrader.run(creep);
+		}
+		if(creep.memory.role == 'claimer') {
+			roleUpgrader.run(creep, 'reserve', secondRoom);
 		}
 		if(creep.memory.role == 'builder') {
 			roleBuilder.run(creep);
@@ -89,16 +92,18 @@ var remoteMiners = _.sum(Game.creeps, (creep) => creep.memory.role == 'remoteMin
 var carriers = _.sum(Game.creeps, (creep) => creep.memory.role == 'carrier');
 var remoteCarriers = _.sum(Game.creeps, (creep) => creep.memory.role == 'remoteCarrier');
 var upgraders = _.sum(Game.creeps, (creep) => creep.memory.role == 'upgrader');
+var claimers = _.sum(Game.creeps, (creep) => creep.memory.role == 'claimer');
 var builders = _.sum(Game.creeps, (creep) => creep.memory.role == 'builder');
 var repairers = _.sum(Game.creeps, (creep) => creep.memory.role == 'repairer');
 var wallRepairers = _.sum(Game.creeps, (creep) => creep.memory.role == 'wallRepairer');
 
 var minimumHarvesters = 1;
 var minimumMiners = 4;
-var minimumRemoteMiners = 1;
+var minimumRemoteMiners = 2;
 var minimumCarriers = miners + 1;
 var minimumRemoteCarriers = remoteMiners + 2;
 var minimumUpgraders = 3;
+var minimumClaimers = 0;
 var minimumBuilders = 1;
 var minimumRepairers = 3;
 var minimumWallRepairers = 2;
@@ -112,6 +117,7 @@ var extension = Game.spawns.Spawn1.room.find(FIND_STRUCTURES, {
 var extensions = extension.length;
 
 var workerBody = [];
+var claimerBody = [];
 var carrierBody = [];
 var minerBody = [];
 var defenderBody = [];
@@ -136,10 +142,12 @@ else if(extensions >= 3 && extensions < 8 && miners > 0 && carriers > 0) {
 }
 else if(extensions >= 8 && miners > 0 && carriers > 0) {
 	var workerCost = 650;
+	var claimerCost = 650;
 	var carrierCost = 400;
 	var minerCost = 550;
 	var defenderCost = 600;
 	workerBody.push(WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE);
+	claimerBody.push(CLAIM,MOVE);
 	carrierBody.push(CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE);
 	minerBody.push(WORK,WORK,WORK,WORK,MOVE,MOVE,MOVE);
 	defenderBody.push(RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE,MOVE);
@@ -157,6 +165,7 @@ var newRemoteMinerName = 'RemoteMiner' + randomNum;
 var newCarrierName = 'Carrier' + randomNum;
 var newRemoteCarrierName = 'RemoteCarrier' + randomNum;
 var newUpgraderName = 'Upgrader' + randomNum;
+var newClaimerName = 'Claimer' + randomNum;
 var newBuilderName = 'Builder' + randomNum;
 var newRepairerName = 'Repairer' + randomNum;
 var newWallRepairerName = 'WallRepairer' + randomNum;
@@ -186,7 +195,7 @@ else {
 		var name = Game.spawns['Spawn1'].createCreep(workerBody, newHarvesterName, {role: 'harvester'});
 	}
 }
-//	Handle the spawning of miners above the count of 1
+//	Handle the spawning of miners above the count of 1 and remoteMiners when miners are at 4
 if(totalSappingCreeps > 3 && miners < 2) {
 	if(miners < minimumMiners) {
 		var name = Game.spawns['Spawn1'].createCreep(minerBody, newMinerName, {role: 'miner'});
@@ -207,11 +216,22 @@ else if(totalSappingCreeps > 12 && remoteMiners < 1) {
 		var name = Game.spawns['Spawn1'].createCreep(minerBody, newRemoteMinerName, {role: 'remoteMiner'});
 	}
 }
+else if(totalSappingCreeps > 15 && remoteMiners < 2) {
+	if(remoteMiners < minimumRemoteMiners) {
+		var name = Game.spawns['Spawn1'].createCreep(minerBody, newRemoteMinerName, {role: 'remoteMiner'});
+	}
+}
 else {
 	if(remoteMiners > 0 && remoteCarriers < minimumRemoteCarriers) {
 		var name = Game.spawns['Spawn1'].createCreep(carrierBody, newRemoteCarrierName, {role: 'remoteCarrier'});
 	}
-	//	Handle the conditions for spawning a third upgrader, else handle the conditions for spawning an upgrader
+//	Handle the conditions for spawning a claimer
+if (remoteMiners > 0 && remoteCarriers > 1) {
+	if (claimers < minimumClaimers) {
+		var name = Game.spawns['Spawn1'].createCreep(claimerBody, newClaimerName, {role: 'claimer'});
+	}
+}
+//	Handle the conditions for spawning a third upgrader, else handle the conditions for spawning an upgrader
 	if(repairers > 0 && builders > 0 && miners > 2 && carriers > 2 && upgraders < 3) {
 		if(upgraders < minimumUpgraders) {
 			var name = Game.spawns['Spawn1'].createCreep(workerBody, newUpgraderName, {role: 'upgrader'});
