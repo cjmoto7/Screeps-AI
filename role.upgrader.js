@@ -1,5 +1,5 @@
 module.exports = {
-	/** @param {Creep} creep **/
+
 	run: function(creep) {
 
 		if(creep.memory.working && creep.carry.energy == 0) {
