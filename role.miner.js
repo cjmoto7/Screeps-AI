@@ -11,7 +11,8 @@ module.exports = {
 		}
 		else if(isRoaming) {
 			if(creep.room.name != destRoom) {
-				creep.moveTo(Game.flags.second);
+				let a = new RoomPosition(25,25,destRoom);
+				creep.moveTo(a);
 			}
 			else if(creep.room.name = destRoom) {
 				var remoteSource = creep.pos.findClosestByPath(FIND_SOURCES, {
