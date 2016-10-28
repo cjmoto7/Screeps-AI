@@ -1,6 +1,6 @@
-module.exports = {
+var controllerFunctions = {};
 
-	run: function(creep) {
+controllerFunctions.upgrade = function(creep) {
 
 		if(creep.memory.working && creep.carry.energy == 0) {
 			creep.memory.working = false;
@@ -37,9 +37,8 @@ module.exports = {
 				}
 			}
 		}
-	}
-/*	var claimer = function(creep, claimRole, destRoom) {
-		if (claimRole = 'reserve') {
+	};
+	controllerFunctions.reserve = function(creep, destRoom) {
 			if(creep.room.name != destRoom) {
 				creep.moveTo(Game.flags.second);
 			}
@@ -48,16 +47,5 @@ module.exports = {
 					creep.moveTo(creep.room.controller);
 				}
 			}
-		}
-		else if (claimRole = 'claim') {
-			if(creep.room.name != destRoom) {
-				creep.moveTo(Game.flags.second);
-			}
-			else if (creep.room.name = destRoom) {
-				if (creep.claimController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-					creep.moveTo(creep.room.controller);
-				}
-			}
-		}
-	}*/
-};
+	};
+module.exports = controllerFunctions;
