@@ -35,10 +35,10 @@ module.exports.loop = function () {
 			roleCarrier.run(creep, true, secondRoom, firstMainRoom);
 		}
 		if(creep.memory.role == 'upgrader') {
-			roleUpgrader.run(creep);
+			roleUpgrader.upgrade(creep);
 		}
 		if(creep.memory.role == 'claimer') {
-			roleUpgrader.run(creep, 'reserve', secondRoom);
+			roleUpgrader.reserve(creep, secondRoom);
 		}
 		if(creep.memory.role == 'builder') {
 			roleBuilder.run(creep);
@@ -176,44 +176,44 @@ var name = undefined;
 //	Handle the spawning of the first and only temporary harvester
 if(harvesters > 0) {
 	if(miners < minimumMiners) {
-		var name = Game.spawns['Spawn1'].createCreep(minerBody, newMinerName, {role: 'miner'});
+		var name = Game.spawns['Spawn1'].createCreep(minerBody, newMinerName, {role: 'miner', spawnedBy: 'Spawn1'});
 	}
 	if(carriers < minimumCarriers && miners > 0) {
-		var name = Game.spawns['Spawn1'].createCreep(carrierBody, newCarrierName, {role: 'carrier'});
+		var name = Game.spawns['Spawn1'].createCreep(carrierBody, newCarrierName, {role: 'carrier', spawnedBy: 'Spawn1'});
 	}
 }
 else if(harvesters < 1 && miners > 0 && carriers > 0) {
 	if(miners < minimumMiners) {
-		var name = Game.spawns['Spawn1'].createCreep(minerBody, newMinerName, {role: 'miner'});
+		var name = Game.spawns['Spawn1'].createCreep(minerBody, newMinerName, {role: 'miner', spawnedBy: 'Spawn1'});
 	}
 	if(carriers < minimumCarriers) {
-		var name = Game.spawns['Spawn1'].createCreep(carrierBody, newCarrierName, {role: 'carrier'});
+		var name = Game.spawns['Spawn1'].createCreep(carrierBody, newCarrierName, {role: 'carrier', spawnedBy: 'Spawn1'});
 	}
 }
 else {
 	if(harvesters < minimumHarvesters) {
-		var name = Game.spawns['Spawn1'].createCreep(workerBody, newHarvesterName, {role: 'harvester'});
+		var name = Game.spawns['Spawn1'].createCreep(workerBody, newHarvesterName, {role: 'harvester', spawnedBy: 'Spawn1'});
 	}
 }
 //	Handle the spawning of miners above the count of 1 and remoteMiners when miners are at 4
 if(totalSappingCreeps > 3 && miners < 2) {
 	if(miners < minimumMiners) {
-		var name = Game.spawns['Spawn1'].createCreep(minerBody, newMinerName, {role: 'miner'});
+		var name = Game.spawns['Spawn1'].createCreep(minerBody, newMinerName, {role: 'miner', spawnedBy: 'Spawn1'});
 	}
 }
 else if(totalSappingCreeps > 6 && miners < 3) {
 	if(miners < minimumMiners) {
-		var name = Game.spawns['Spawn1'].createCreep(minerBody, newMinerName, {role: 'miner'});
+		var name = Game.spawns['Spawn1'].createCreep(minerBody, newMinerName, {role: 'miner', spawnedBy: 'Spawn1'});
 	}
 }
 else if(totalSappingCreeps > 10 && miners < 4) {
 	if(miners < minimumMiners) {
-		var name = Game.spawns['Spawn1'].createCreep(minerBody, newMinerName, {role: 'miner'});
+		var name = Game.spawns['Spawn1'].createCreep(minerBody, newMinerName, {role: 'miner', spawnedBy: 'Spawn1'});
 	}
 }
 else if(totalSappingCreeps > 12 && remoteMiners < 1) {
 	if(remoteMiners < minimumRemoteMiners) {
-		var name = Game.spawns['Spawn1'].createCreep(minerBody, newRemoteMinerName, {role: 'remoteMiner'});
+		var name = Game.spawns['Spawn1'].createCreep(minerBody, newRemoteMinerName, {role: 'remoteMiner', spawnedBy: 'Spawn1'});
 	}
 }
 else if(totalSappingCreeps > 15 && remoteMiners < 2) {
