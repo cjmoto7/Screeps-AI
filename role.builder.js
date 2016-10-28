@@ -23,7 +23,7 @@ module.exports = {
 			}
 			else {
 				// go upgrade the controller
-				roleUpgrader.run(creep);
+				roleUpgrader.upgrade(creep);
 			}
 		}
 		else {
