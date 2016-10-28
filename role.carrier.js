@@ -21,10 +21,10 @@ module.exports = {
 				}
 			}
 			else {
-				var targets = creep.room.find(FIND_STRUCTURES, {
+				var targets = creep.pos.findClosestByPath(FIND_STRUCTURES, {
 					filter: (s) => {
-						return (s.structureType == STRUCTURE_SPAWN ||
-							s.structureType == STRUCTURE_EXTENSION ||
+						return (s.structureType == STRUCTURE_EXTENSION ||
+							s.structureType == STRUCTURE_SPAWN ||
 							s.structureType == STRUCTURE_TOWER) &&
 							s.energy < s.energyCapacity;
 						}
@@ -33,9 +33,9 @@ module.exports = {
 						filter: (container) => (container.structureType == STRUCTURE_CONTAINER || container.structureType == STRUCTURE_STORAGE) &&
 						container.store[RESOURCE_ENERGY] < container.storeCapacity
 					});
-					if(targets.length > 0) {
-						if(creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-							creep.moveTo(targets[0]);
+					if(targets) {
+						if(creep.transfer(targets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+							creep.moveTo(targets);
 						}
 					}
 					else if(containers.length > 0) {
@@ -48,7 +48,8 @@ module.exports = {
 			else if(isRoaming) {
 				if(!creep.memory.working) {
 					if(creep.room.name != destRoom) {
-						creep.moveTo(Game.flags.second);
+						let a = new RoomPosition(25,25,destRoom);
+						creep.moveTo(a);
 					}
 					else if(creep.room.name = destRoom) {
 						var remoteDroppings = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
@@ -64,10 +65,10 @@ module.exports = {
 						creep.moveTo(Game.spawns.Spawn1);
 					}
 					else if(creep.room.name = sourceRoom) {
-						var sourceTargets = creep.room.find(FIND_STRUCTURES, {
+						var sourceTargets = creep.pos.findClosestByPath(FIND_STRUCTURES, {
 							filter: (sa) => {
-								return (sa.structureType == STRUCTURE_SPAWN ||
-									sa.structureType == STRUCTURE_EXTENSION ||
+								return (sa.structureType == STRUCTURE_EXTENSION ||
+									sa.structureType == STRUCTURE_SPAWN ||
 									sa.structureType == STRUCTURE_TOWER) &&
 									sa.energy < sa.energyCapacity;
 								}
@@ -76,9 +77,9 @@ module.exports = {
 								filter: (con) => (con.structureType == STRUCTURE_CONTAINER || con.structureType == STRUCTURE_STORAGE) &&
 								con.store[RESOURCE_ENERGY] < con.storeCapacity
 							});
-							if(sourceTargets.length > 0) {
-								if(creep.transfer(sourceTargets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-									creep.moveTo(sourceTargets[0]);
+							if(sourceTargets) {
+								if(creep.transfer(sourceTargets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+									creep.moveTo(sourceTargets);
 								}
 							}
 							else if(sourceContainers.length > 0) {
