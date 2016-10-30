@@ -29,7 +29,7 @@ module.exports = {
 			}
 			// if we can't find one go build
 			else {
-				roleBuilder.run(creep);
+				roleBuilder.build(creep);
 			}
 		}
 		// if creep is supposed to harvest energy from source
@@ -45,7 +45,7 @@ module.exports = {
 			}
 			else {
 				var droppings = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
-					filter: (d) => {return (d.resourceType == RESOURCE_ENERGY)}
+					filter: (d) => {return (d.resourceType == RESOURCE_ENERGY && d.amount >= 20)}
 				});
 				if(creep.pickup(droppings) == ERR_NOT_IN_RANGE) {
 					creep.moveTo(droppings);

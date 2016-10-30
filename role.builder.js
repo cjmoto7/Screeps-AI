@@ -1,8 +1,7 @@
 var roleUpgrader = require('role.upgrader');
 
-module.exports = {
-	/** @param {Creep} creep **/
-	run: function(creep) {
+var buildFunctions = {};
+	buildFunctions.build = function(creep) {
 
 		if(creep.memory.working && creep.carry.energy == 0) {
 			creep.memory.working = false;
@@ -38,12 +37,23 @@ module.exports = {
 			}
 			else {
 				var droppings = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
-					filter: (d) => {return (d.resourceType == RESOURCE_ENERGY)}
+					filter: (d) => {return (d.resourceType == RESOURCE_ENERGY && d.amount >= 20)}
 				});
 				if(creep.pickup(droppings) == ERR_NOT_IN_RANGE) {
 					creep.moveTo(droppings);
 				}
 			}
 		}
-	}
-};
+	};
+	buildFunctions.buildRemote = function(creep, destRoom) {
+
+		if(creep.room.name != destRoom) {
+			let a = new RoomPosition(25,25,destRoom);
+			creep.moveTo(a);
+		}
+		else if (creep.room.name = destRoom) {
+			buildFunctions.build(creep);
+		}
+	};
+
+module.exports = buildFunctions;
