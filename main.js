@@ -69,13 +69,20 @@ module.exports.loop = function () {
 			roleBuilder.buildRemote(creep, secondRoom.Spawn1);
 		}
 		if(creep.memory.role == 'repairer') {
-			roleRepairer.run(creep);
+			roleRepairer.repair(creep);
+		}
+		if(creep.memory.role == 'remoteRepairer' && creep.memory.spawnedBy == 'Spawn1') {
+			roleRepairer.remoteRepair(creep, secondRoom.Spawn1);
+		}
+		if(creep.memory.role == 'remoteRepairer' && creep.memory.spawnedBy == 'Spawn2') {
+			roleRepairer.remoteRepair(creep, secondRoom.Spawn2);
 		}
 		if(creep.memory.role == 'wallRepairer') {
 			roleWallRepairer.run(creep);
 		}
 	}
 
+console.log('After creep roles before tower' + Game.cpu.getUsed());
 	//  Handle repairing and attacking for towers
 	var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER);
 	for (let tower of towers) {
@@ -139,22 +146,28 @@ module.exports.loop = function () {
 		Spawn1: _.sum(Game.creeps, (creep) => creep.memory.role == 'repairer' && creep.memory.spawnedBy == 'Spawn1'),
 		Spawn2: _.sum(Game.creeps, (creep) => creep.memory.role == 'repairer' && creep.memory.spawnedBy == 'Spawn2')
 	};
+	var remoteRepairers = {
+		Spawn1: _.sum(Game.creeps, (creep) => creep.memory.role == 'remoteRepairers' && creep.memory.spawnedBy == 'Spawn1'),
+		Spawn2: _.sum(Game.creeps, (creep) => creep.memory.role == 'remoteRepairers' && creep.memory.spawnedBy == 'Spawn2')
+	};
 	var wallRepairers = {
 		Spawn1: _.sum(Game.creeps, (creep) => creep.memory.role == 'wallRepairer' && creep.memory.spawnedBy == 'Spawn1'),
 		Spawn2: _.sum(Game.creeps, (creep) => creep.memory.role == 'wallRepairer' && creep.memory.spawnedBy == 'Spawn2')
 	};
+	console.log('After creep count before pop count' + Game.cpu.getUsed());
 
 //	Desired population count amongst spawns
 	var minimumHarvesters = {Spawn1: 1, Spawn2: 1};
-	var minimumMiners = {Spawn1: 4, Spawn2: 4};
-	var minimumRemoteMiners = {Spawn1: 2, Spawn2: 1};
-	var minimumCarriers = {Spawn1: miners.Spawn1 + 1, Spawn2: miners.Spawn2 + 1};
-	var minimumRemoteCarriers = {Spawn1: remoteMiners.Spawn1 + 3, Spawn2: remoteMiners.Spawn2 + 3};
-	var minimumUpgraders = {Spawn1: 3, Spawn2: 3};
+	var minimumMiners = {Spawn1: 4, Spawn2: 3};
+	var minimumRemoteMiners = {Spawn1: 1, Spawn2: 0};
+	var minimumCarriers = {Spawn1: miners.Spawn1 + 1, Spawn2: miners.Spawn2};
+	var minimumRemoteCarriers = {Spawn1: remoteMiners.Spawn1 + 2, Spawn2: remoteMiners.Spawn2 + 3};
+	var minimumUpgraders = {Spawn1: 2, Spawn2: 2};
 	var minimumClaimers = {Spawn1: 1, Spawn2: 0};
 	var minimumBuilders = {Spawn1: 1, Spawn2: 1};
-	var minimumRemoteBuilders = {Spawn1: 1, Spawn2: 0};
-	var minimumRepairers = {Spawn1: 1, Spawn2: 2};
+	var minimumRemoteBuilders = {Spawn1: 0, Spawn2: 0};
+	var minimumRepairers = {Spawn1: 1, Spawn2: 1};
+	var minimumRemoteRepairers = {Spawn1: 1, Spawn2: 0};
 	var minimumWallRepairers = {Spawn1: 1, Spawn2: 1};
 
 	var totalSappingCreeps = {
@@ -245,7 +258,9 @@ module.exports.loop = function () {
 	var newBuilderName = 'Builder' + randomNum;
 	var newRemoteBuilderName = 'RemoteBuilder' + randomNum;
 	var newRepairerName = 'Repairer' + randomNum;
+//	var newRemoteRepairerName = 'RemoteRepairer' + randomNum;
 	var newWallRepairerName = 'WallRepairer' + randomNum;
+	console.log('Just before creep spawn' + Game.cpu.getUsed());
 
 	var nameful = undefined;
 	//  Spawn creeps at each spawning
@@ -363,6 +378,10 @@ module.exports.loop = function () {
 					var nameful = eachSpawn.createCreep(workerBody[name], newRepairerName, {role: 'repairer', spawnedBy: name});
 					console.log(nameful);
 				}
+				else if (repairers[name] > 0 && remoteRepairers[name] < minimumRemoteRepairers[name]) {
+					var nameful = eachSpawn.createCreep(workerBody[name], newRemoteRepairerName, {role: 'remoteRepairer', spawnedBy: name});
+					console.log(nameful);
+				}
 			}
 			//	Handle the conditions for spawning a Wall Repairer
 			if(miners[name] > 1 && carriers[name] > 2 && upgraders[name] > 1 && builders[name] > 0 && repairers[name] > 1 && wallRepairers[name] < 2) {
@@ -386,4 +405,6 @@ module.exports.loop = function () {
 			}
 		}
 	}
+	console.log('After creep spawn' + Game.cpu.getUsed());
+
 };

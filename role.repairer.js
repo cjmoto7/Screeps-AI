@@ -1,8 +1,9 @@
 var roleBuilder = require('role.builder');
 
-module.exports = {
+var repairFunctions = {};
 	// a function to run the logic for this role
-	run: function(creep) {
+	repairFunctions.repair = function(creep) {
+
 		if (creep.memory.working && creep.carry.energy == 0) {
 			creep.memory.working = false;
 			creep.say('gathering');
@@ -52,5 +53,15 @@ module.exports = {
 				}
 			}
 		}
-	}
-};
+	};
+	repairFunctions.remoteRepair = function(creep, destRoom) {
+
+		if(creep.room.name != destRoom) {
+			let a = new RoomPosition(25,25,destRoom);
+			creep.moveTo(a);
+		}
+		else if (creep.room.name = destRoom) {
+			repairFunctions.repair(creep);
+		}
+	};
+	module.exports = repairFunctions;
