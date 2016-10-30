@@ -168,7 +168,7 @@ console.log('After creep roles before tower' + Game.cpu.getUsed());
 	var minimumRemoteBuilders = {Spawn1: 0, Spawn2: 0};
 	var minimumRepairers = {Spawn1: 1, Spawn2: 1};
 	var minimumRemoteRepairers = {Spawn1: 1, Spawn2: 0};
-	var minimumWallRepairers = {Spawn1: 1, Spawn2: 1};
+	var minimumWallRepairers = {Spawn1: 1, Spawn2: 0};
 
 	var totalSappingCreeps = {
 		Spawn1: carriers.Spawn1 + upgraders.Spawn1 + builders.Spawn1 + repairers.Spawn1 + wallRepairers.Spawn1 + remoteCarriers.Spawn1,
