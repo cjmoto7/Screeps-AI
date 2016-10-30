@@ -258,7 +258,7 @@ console.log('After creep roles before tower' + Game.cpu.getUsed());
 	var newBuilderName = 'Builder' + randomNum;
 	var newRemoteBuilderName = 'RemoteBuilder' + randomNum;
 	var newRepairerName = 'Repairer' + randomNum;
-//	var newRemoteRepairerName = 'RemoteRepairer' + randomNum;
+	var newRemoteRepairerName = 'RemoteRepairer' + randomNum;
 	var newWallRepairerName = 'WallRepairer' + randomNum;
 	console.log('Just before creep spawn' + Game.cpu.getUsed());
 
