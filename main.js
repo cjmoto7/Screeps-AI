@@ -154,7 +154,7 @@ module.exports.loop = function () {
 	var minimumClaimers = {Spawn1: 1, Spawn2: 0};
 	var minimumBuilders = {Spawn1: 1, Spawn2: 1};
 	var minimumRemoteBuilders = {Spawn1: 1, Spawn2: 0};
-	var minimumRepairers = {Spawn1: 1, Spawn2: 1};
+	var minimumRepairers = {Spawn1: 1, Spawn2: 2};
 	var minimumWallRepairers = {Spawn1: 1, Spawn2: 1};
 
 	var totalSappingCreeps = {
