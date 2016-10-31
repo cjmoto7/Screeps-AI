@@ -82,7 +82,6 @@ module.exports.loop = function () {
 		}
 	}
 
-console.log('After creep roles before tower' + Game.cpu.getUsed());
 	//  Handle repairing and attacking for towers
 	var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER);
 	for (let tower of towers) {
@@ -147,32 +146,31 @@ console.log('After creep roles before tower' + Game.cpu.getUsed());
 		Spawn2: _.sum(Game.creeps, (creep) => creep.memory.role == 'repairer' && creep.memory.spawnedBy == 'Spawn2')
 	};
 	var remoteRepairers = {
-		Spawn1: _.sum(Game.creeps, (creep) => creep.memory.role == 'remoteRepairers' && creep.memory.spawnedBy == 'Spawn1'),
-		Spawn2: _.sum(Game.creeps, (creep) => creep.memory.role == 'remoteRepairers' && creep.memory.spawnedBy == 'Spawn2')
+		Spawn1: _.sum(Game.creeps, (creep) => creep.memory.role == 'remoteRepairer' && creep.memory.spawnedBy == 'Spawn1'),
+		Spawn2: _.sum(Game.creeps, (creep) => creep.memory.role == 'remoteRepairer' && creep.memory.spawnedBy == 'Spawn2')
 	};
 	var wallRepairers = {
 		Spawn1: _.sum(Game.creeps, (creep) => creep.memory.role == 'wallRepairer' && creep.memory.spawnedBy == 'Spawn1'),
 		Spawn2: _.sum(Game.creeps, (creep) => creep.memory.role == 'wallRepairer' && creep.memory.spawnedBy == 'Spawn2')
 	};
-	console.log('After creep count before pop count' + Game.cpu.getUsed());
 
-//	Desired population count amongst spawns
+	//	Desired population count amongst spawns
 	var minimumHarvesters = {Spawn1: 1, Spawn2: 1};
-	var minimumMiners = {Spawn1: 4, Spawn2: 3};
+	var minimumMiners = {Spawn1: 4, Spawn2: 4};
 	var minimumRemoteMiners = {Spawn1: 1, Spawn2: 0};
 	var minimumCarriers = {Spawn1: miners.Spawn1 + 1, Spawn2: miners.Spawn2};
 	var minimumRemoteCarriers = {Spawn1: remoteMiners.Spawn1 + 2, Spawn2: remoteMiners.Spawn2 + 3};
-	var minimumUpgraders = {Spawn1: 2, Spawn2: 2};
+	var minimumUpgraders = {Spawn1: 3, Spawn2: 3};
 	var minimumClaimers = {Spawn1: 1, Spawn2: 0};
 	var minimumBuilders = {Spawn1: 1, Spawn2: 1};
 	var minimumRemoteBuilders = {Spawn1: 0, Spawn2: 0};
 	var minimumRepairers = {Spawn1: 1, Spawn2: 1};
 	var minimumRemoteRepairers = {Spawn1: 1, Spawn2: 0};
-	var minimumWallRepairers = {Spawn1: 1, Spawn2: 0};
+	var minimumWallRepairers = {Spawn1: 1, Spawn2: 1};
 
 	var totalSappingCreeps = {
-		Spawn1: carriers.Spawn1 + upgraders.Spawn1 + builders.Spawn1 + repairers.Spawn1 + wallRepairers.Spawn1 + remoteCarriers.Spawn1,
-		Spawn2: carriers.Spawn2 + upgraders.Spawn2 + builders.Spawn2 + repairers.Spawn2 + wallRepairers.Spawn2 + remoteCarriers.Spawn2
+		Spawn1: carriers.Spawn1 + upgraders.Spawn1 + builders.Spawn1 + repairers.Spawn1 + wallRepairers.Spawn1 + remoteCarriers.Spawn1 + remoteBuilders.Spawn1 + remoteRepairers.Spawn1,
+		Spawn2: carriers.Spawn2 + upgraders.Spawn2 + builders.Spawn2 + repairers.Spawn2 + wallRepairers.Spawn2 + remoteCarriers.Spawn2 + remoteBuilders.Spawn2 + remoteRepairers.Spawn2
 	};
 	//  Creep body determined by how many extensions we have (per spawn)
 	var maxEnergy = {
@@ -201,9 +199,12 @@ console.log('After creep roles before tower' + Game.cpu.getUsed());
 	var defenderCost = { };
 	var claimerCost = { };
 
+	var tier = { };
+
 	for (let name in Game.spawns) {
 		let eachSpawn = Game.spawns[name];
 		if(extensions[name] < 3 || (miners[name] < 1 || carriers[name] < 1)) {
+			tier[name] = 1;
 			workerCost[name] = 250;
 			carrierCost[name] = 200;
 			minerCost[name] = 250;
@@ -212,6 +213,7 @@ console.log('After creep roles before tower' + Game.cpu.getUsed());
 			minerBody[name].push(WORK,WORK,MOVE);
 		}
 		else if(extensions[name] >= 3 && extensions[name] < 8 && miners[name] > 0 && carriers[name] > 0) {
+			tier[name] = 2;
 			workerCost[name] = 400;
 			carrierCost[name] = 300;
 			minerCost[name] = 400;
@@ -222,6 +224,7 @@ console.log('After creep roles before tower' + Game.cpu.getUsed());
 			defenderBody[name].push(RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE);
 		}
 		else if(extensions[name] >= 8 && miners[name] > 0 && carriers[name] > 0) {
+			tier[name] = 3;
 			workerCost[name] = 650;
 			claimerCost[name] = 1300;
 			carrierCost[name] = 400;
@@ -233,7 +236,21 @@ console.log('After creep roles before tower' + Game.cpu.getUsed());
 			minerBody[name].push(WORK,WORK,WORK,WORK,MOVE,MOVE,MOVE);
 			defenderBody[name].push(RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE,MOVE);
 		}
+		else if(extensions[name] >= 16 && miners[name] > 0 && carriers[name] > 0) {
+			tier[name] = 4;
+			workerCost[name] = 1050;
+			claimerCost[name] = 1300;
+			carrierCost[name] = 600;
+			minerCost[name] = 850;
+			defenderCost[name] = 1000;
+			workerBody[name].push(WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE);
+			claimerBody[name].push(CLAIM,CLAIM,MOVE,MOVE);
+			carrierBody[name].push(CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE);
+			minerBody[name].push(WORK,WORK,WORK,WORK,WORK,WORK,MOVE,MOVE,MOVE,MOVE,MOVE);
+			defenderBody[name].push(RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE);
+		}
 		else {
+			tier[name] = 1;
 			workerCost[name] = 250;
 			carrierCost[name] = 200;
 			minerCost[name] = 250;
@@ -242,6 +259,20 @@ console.log('After creep roles before tower' + Game.cpu.getUsed());
 			minerBody[name].push(WORK,WORK,MOVE);
 		}
 	}
+	//	Conditions for creep count modifiers
+	for (let name in Game.spawns) {
+		if (tier[name] = 3) {
+			minimumCarriers[name] -= 1;
+			minimumMiners[name] -= 1;
+		}
+		else if (tier[name] = 4) {
+			minimumCarriers[name] -= 2;
+			minimumMiners[name] -= 2;
+			minimumRemoteCarriers[name] -= 1;
+			minimumUpgraders[name] -= 1;
+		}
+	}
+
 	//  Generate random number for naming the creeps
 	var minRandomNum = 999;
 	var maxRandomNum = 9999;
@@ -260,7 +291,6 @@ console.log('After creep roles before tower' + Game.cpu.getUsed());
 	var newRepairerName = 'Repairer' + randomNum;
 	var newRemoteRepairerName = 'RemoteRepairer' + randomNum;
 	var newWallRepairerName = 'WallRepairer' + randomNum;
-	console.log('Just before creep spawn' + Game.cpu.getUsed());
 
 	var nameful = undefined;
 	//  Spawn creeps at each spawning
@@ -270,130 +300,128 @@ console.log('After creep roles before tower' + Game.cpu.getUsed());
 		if(harvesters[name] > 0) {
 			if(miners[name] < minimumMiners[name]) {
 				var nameful = eachSpawn.createCreep(minerBody[name], newMinerName, {role: 'miner', spawnedBy: name});
-				console.log(nameful);
+				console.log(name + ' is making a ' + nameful);
 			}
 			if(carriers[name] < minimumCarriers[name] && miners[name] > 0) {
 				var nameful = eachSpawn.createCreep(carrierBody[name], newCarrierName, {role: 'carrier', spawnedBy: name});
-				console.log(nameful);
+				console.log(name + ' is making a ' + nameful);
 			}
 		}
 		else if(harvesters[name] < 1 && miners[name] > 0 && carriers[name] > 0) {
 			if(miners[name] < minimumMiners[name]) {
 				var nameful = eachSpawn.createCreep(minerBody[name], newMinerName, {role: 'miner', spawnedBy: name});
-				console.log(nameful);
+				console.log(name + ' is making a ' + nameful);
 			}
 			if(carriers[name] < minimumCarriers[name]) {
 				var nameful = eachSpawn.createCreep(carrierBody[name], newCarrierName, {role: 'carrier', spawnedBy: name});
-				console.log(nameful);
+				console.log(name + ' is making a ' + nameful);
 			}
 		}
 		else {
 			if(harvesters[name] < minimumHarvesters[name]) {
 				var nameful = eachSpawn.createCreep(workerBody[name], newHarvesterName, {role: 'harvester', spawnedBy: name});
-				console.log(nameful);
+				console.log(name + ' is making a ' + nameful);
 			}
 		}
 		//	Handle the spawning of miners above the count of 1 and remoteMiners when miners are at 4
-		if(totalSappingCreeps[name] > 2 && miners[name] < 2) {
+		if(totalSappingCreeps[name] > 1 && miners[name] < 2) {
 			if(miners[name] < minimumMiners[name]) {
 				var nameful = eachSpawn.createCreep(minerBody[name], newMinerName, {role: 'miner', spawnedBy: name});
-				console.log(nameful);
+				console.log(name + ' is making a ' + nameful);
 			}
 		}
-		else if(totalSappingCreeps[name] > 4 && miners[name] < 3) {
+		else if(totalSappingCreeps[name] > 3 && miners[name] < 3) {
 			if(miners[name] < minimumMiners[name]) {
 				var nameful = eachSpawn.createCreep(minerBody[name], newMinerName, {role: 'miner', spawnedBy: name});
-				console.log(nameful);
+				console.log(name + ' is making a ' + nameful);
 			}
 		}
-		else if(totalSappingCreeps[name] > 8 && miners[name] < 4) {
+		else if(totalSappingCreeps[name] > 6 && miners[name] < 4) {
 			if(miners[name] < minimumMiners[name]) {
 				var nameful = eachSpawn.createCreep(minerBody[name], newMinerName, {role: 'miner', spawnedBy: name});
-				console.log(nameful);
+				console.log(name + ' is making a ' + nameful);
 			}
 		}
-		else if(totalSappingCreeps[name] > 10 && remoteMiners[name] < 1) {
+		else if(totalSappingCreeps[name] > 8 && remoteMiners[name] < 1) {
 			if(remoteMiners[name] < minimumRemoteMiners[name]) {
 				var nameful = eachSpawn.createCreep(minerBody[name], newRemoteMinerName, {role: 'remoteMiner', spawnedBy: name});
-				console.log(nameful);
+				console.log(name + ' is making a ' + nameful);
 			}
 		}
-		else if(totalSappingCreeps[name] > 13 && remoteMiners[name] < 2) {
+		else if(totalSappingCreeps[name] > 11 && remoteMiners[name] < 2) {
 			if(remoteMiners[name] < minimumRemoteMiners[name]) {
 				var nameful = eachSpawn.createCreep(minerBody[name], newRemoteMinerName, {role: 'remoteMiner', spawnedBy: name});
-				console.log(nameful);
+				console.log(name + ' is making a ' + nameful);
 			}
 		}
 		else {
 			if(remoteMiners[name] > 0 && remoteCarriers[name] < minimumRemoteCarriers[name]) {
 				var nameful = eachSpawn.createCreep(carrierBody[name], newRemoteCarrierName, {role: 'remoteCarrier', spawnedBy: name});
-				console.log(nameful);
+				console.log(name + ' is making a ' + nameful);
 			}
-			//	Handle the conditions for spawning a claimer
-			if (remoteMiners[name] > 0 && remoteCarriers[name] > 1) {
-				if (claimers[name] < minimumClaimers[name]) {
-					var nameful = eachSpawn.createCreep(claimerBody[name], newClaimerName, {role: 'claimer', spawnedBy: name});
-					console.log(nameful);
-				}
+			//	Handle the conditions for spawning a claimer or various remoteCreeps
+			if (claimers[name] < minimumClaimers[name]) {
+				var nameful = eachSpawn.createCreep(claimerBody[name], newClaimerName, {role: 'claimer', spawnedBy: name});
+				console.log(name + ' is making a ' + nameful);
+			}
+			else if (repairers[name] > 0 && remoteRepairers[name] < minimumRemoteRepairers[name]) {
+				var nameful = eachSpawn.createCreep(workerBody[name], newRemoteRepairerName, {role: 'remoteRepairer', spawnedBy: name});
+				console.log(name + ' is making a ' + nameful);
+			}
+			else if (builders[name] > 0 && remoteBuilders[name] < minimumRemoteBuilders[name]) {
+				var nameful = eachSpawn.createCreep(workerBody[name], newRemoteBuilderName, {role: 'spawnBuilder', spawnedBy: name});
+				console.log(name + ' is making a ' + nameful);
 			}
 			//	Handle the conditions for spawning a third upgrader, else handle the conditions for spawning an upgrader
 			if(repairers[name] > 0 && builders[name] > 0 && miners[name] > 2 && carriers[name] > 2 && upgraders[name] < 3) {
 				if(upgraders[name] < minimumUpgraders[name]) {
 					var nameful = eachSpawn.createCreep(workerBody[name], newUpgraderName, {role: 'upgrader', spawnedBy: name});
-					console.log(nameful);
+					console.log(name + ' is making a ' + nameful);
 				}
 			}
 			else if(miners[name] > 1 && carriers[name] > 2 && upgraders[name] < 2) {
 				if(upgraders[name] < minimumUpgraders[name]) {
 					var nameful = eachSpawn.createCreep(workerBody[name], newUpgraderName, {role: 'upgrader', spawnedBy: name});
-					console.log(nameful);
+					console.log(name + ' is making a ' + nameful);
 				}
 			}
 			else if(miners[name] > 0 && carriers[name] > 1 && upgraders[name] < 1) {
 				if(upgraders[name] < minimumUpgraders[name]) {
 					var nameful = eachSpawn.createCreep(workerBody[name], newUpgraderName, {role: 'upgrader', spawnedBy: name});
-					console.log(nameful);
+					console.log(name + ' is making a ' + nameful);
 				}
 			}
 			//	Handle the conditions for spawning a builder
 			if(miners[name] > 0 && carriers[name] > 1 && upgraders[name] > 0) {
 				if (builders[name] < minimumBuilders[name]) {
-				var nameful = eachSpawn.createCreep(workerBody[name], newBuilderName, {role: 'builder', spawnedBy: name});
-				console.log(nameful);
+					var nameful = eachSpawn.createCreep(workerBody[name], newBuilderName, {role: 'builder', spawnedBy: name});
+					console.log(name + ' is making a ' + nameful);
 				}
-			else if (builders[name] > 0 && remoteBuilders[name] < minimumRemoteBuilders[name]) {
-				var nameful = eachSpawn.createCreep(workerBody[name], newRemoteBuilderName, {role: 'spawnBuilder', spawnedBy: name});
-				console.log(nameful);
-			}
 			}
 			//	Handle the conditions for spawning a thrid repairer, else handle the conditions for spawning a repairer
 			if(repairers[name] < 3 && builders[name] > 0 && upgraders[name] > 1 && miners[name] > 2 && carriers[name] > 2) {
 				if(repairers[name] < minimumRepairers[name]) {
 					var nameful = eachSpawn.createCreep(workerBody[name], newRepairerName, {role: 'repairer', spawnedBy: name});
-					console.log(nameful);
+					console.log(name + ' is making a ' + nameful);
 				}
 			}
 			else if(builders[name] > 0 && upgraders[name] > 0 && carriers[name] > 1 && miners[name] > 0) {
 				if(repairers[name] < minimumRepairers[name]) {
 					var nameful = eachSpawn.createCreep(workerBody[name], newRepairerName, {role: 'repairer', spawnedBy: name});
-					console.log(nameful);
-				}
-				else if (repairers[name] > 0 && remoteRepairers[name] < minimumRemoteRepairers[name]) {
-					var nameful = eachSpawn.createCreep(workerBody[name], newRemoteRepairerName, {role: 'remoteRepairer', spawnedBy: name});
-					console.log(nameful);
+					console.log(name + ' is making a ' + nameful);
 				}
 			}
 			//	Handle the conditions for spawning a Wall Repairer
 			if(miners[name] > 1 && carriers[name] > 2 && upgraders[name] > 1 && builders[name] > 0 && repairers[name] > 1 && wallRepairers[name] < 2) {
 				if(wallRepairers[name] < minimumWallRepairers[name]) {
 					var nameful = eachSpawn.createCreep(workerBody[name], newWallRepairerName, {role: 'wallRepairer', spawnedBy: name});
-					console.log(nameful);
+					console.log(name + ' is making a ' + nameful);
 				}
 			}
 			else if(miners[name] > 0 && carriers[name] > 1 && upgraders[name] > 0 && builders[name] > 0 && repairers[name] > 0) {
 				if(wallRepairers[name] < minimumWallRepairers[name]) {
 					var nameful = eachSpawn.createCreep(workerBody[name], newWallRepairerName, {role: 'wallRepairer', spawnedBy: name});
-					console.log(nameful);
+					console.log(name + ' is making a ' + nameful);
 				}
 			}
 		}
@@ -405,6 +433,5 @@ console.log('After creep roles before tower' + Game.cpu.getUsed());
 			}
 		}
 	}
-	console.log('After creep spawn' + Game.cpu.getUsed());
 
 };
