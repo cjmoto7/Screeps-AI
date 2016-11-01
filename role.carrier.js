@@ -25,7 +25,7 @@ module.exports = {
 					filter: (s) => {
 						return (s.structureType == STRUCTURE_EXTENSION ||
 							s.structureType == STRUCTURE_SPAWN ||
-							s.structureType == STRUCTURE_TOWER) &&
+							(s.structureType == STRUCTURE_TOWER && s.energy < 900)) &&
 							s.energy < s.energyCapacity;
 						}
 					});
@@ -69,7 +69,7 @@ module.exports = {
 							filter: (sa) => {
 								return (sa.structureType == STRUCTURE_EXTENSION ||
 									sa.structureType == STRUCTURE_SPAWN ||
-									sa.structureType == STRUCTURE_TOWER) &&
+									(sa.structureType == STRUCTURE_TOWER && sa.energy < 900)) &&
 									sa.energy < sa.energyCapacity;
 								}
 							});
