@@ -307,7 +307,7 @@ console.log('totalSappingCreeps for Spawn1: ' + totalSappingCreeps.Spawn1 + ', t
 	var newWallRepairerName = 'WallRepairer' + randomNum;
 
 	var nameful = undefined;
-	//  Spawn creeps at each spawning
+	//  Spawn creeps at each spawn
 	for (let name in Game.spawns) {
 		let eachSpawn = Game.spawns[name];
 		//	Handle the spawning of the first and only temporary harvester
@@ -395,13 +395,7 @@ console.log('totalSappingCreeps for Spawn1: ' + totalSappingCreeps.Spawn1 + ', t
 					console.log(name + ' is making a ' + nameful);
 				}
 			}
-			if(miners[name] > 1 && carriers[name] > 1 && upgraders[name] < 2) {
-				if(upgraders[name] < minimumUpgraders[name]) {
-					var nameful = eachSpawn.createCreep(workerBody[name], newUpgraderName, {role: 'upgrader', spawnedBy: name});
-					console.log(name + ' is making a ' + nameful);
-				}
-			}
-			if(miners[name] > 0 && carriers[name] > 1 && upgraders[name] < 1) {
+			if(miners[name] > 0 && carriers[name] > 1 && upgraders[name] < 2) {
 				if(upgraders[name] < minimumUpgraders[name]) {
 					var nameful = eachSpawn.createCreep(workerBody[name], newUpgraderName, {role: 'upgrader', spawnedBy: name});
 					console.log(name + ' is making a ' + nameful);
