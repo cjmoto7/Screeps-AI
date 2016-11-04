@@ -8,7 +8,8 @@ Desktop.ini
 # autocomplete screeps files
 ScreepsAutocomplete/
 .tern-project
-
+test/ScreepsAutocomplete/
+test/.tern-project
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
