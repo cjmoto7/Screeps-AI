@@ -21,7 +21,7 @@ module.exports.loop = function () {
 	var claimerCost = {};
 
 	var tier = {};
-//	Boolean per spawn for wether there are walls in the room or not
+	//	Boolean per spawn for wether there are walls in the room or not
 	var isWalls = {};
 	for (let name in Game.spawns) {
 		let areThereWalls = Game.spawns[name].room.find(FIND_STRUCTURES, {
@@ -284,9 +284,10 @@ module.exports.loop = function () {
 		}
 	}
 	//	Conditions for creep count modifiers
-console.log('Spawn1 extensions: ' + extensions.Spawn1 + ', Spawn2 extensions: ' + extensions.Spawn2);
-console.log('Spawn1 tier: ' + tier.Spawn1 + ', Spawn2 tier: ' + tier.Spawn2);
-console.log('totalSappingCreeps for Spawn1: ' + totalSappingCreeps.Spawn1 + ', totalSappingCreeps for Spawn2: ' + totalSappingCreeps.Spawn2);
+	console.log('Spawn1 extensions: ' + extensions.Spawn1 + ', Spawn2 extensions: ' + extensions.Spawn2);
+	console.log('Spawn1 tier: ' + tier.Spawn1 + ', Spawn2 tier: ' + tier.Spawn2);
+	console.log('Spawn1 minimumUpgraders: ' + minimumUpgraders.Spawn1);
+	console.log('totalSappingCreeps for Spawn1: ' + totalSappingCreeps.Spawn1 + ', totalSappingCreeps for Spawn2: ' + totalSappingCreeps.Spawn2);
 	//  Generate random number for naming the creeps
 	var minRandomNum = 999;
 	var maxRandomNum = 9999;
@@ -375,19 +376,19 @@ console.log('totalSappingCreeps for Spawn1: ' + totalSappingCreeps.Spawn1 + ', t
 			}
 			//	Handle the conditions for spawning a claimer or various remoteCreeps
 			if (remoteMiners[name] > 0) {
-			if (claimers[name] < minimumClaimers[name]) {
-				var nameful = eachSpawn.createCreep(claimerBody[name], newClaimerName, {role: 'claimer', spawnedBy: name});
-				console.log(name + ' is making a ' + nameful);
+				if (claimers[name] < minimumClaimers[name]) {
+					var nameful = eachSpawn.createCreep(claimerBody[name], newClaimerName, {role: 'claimer', spawnedBy: name});
+					console.log(name + ' is making a ' + nameful);
+				}
+				if (remoteRepairers[name] < minimumRemoteRepairers[name]) {
+					var nameful = eachSpawn.createCreep(workerBody[name], newRemoteRepairerName, {role: 'remoteRepairer', spawnedBy: name});
+					console.log(name + ' is making a ' + nameful);
+				}
+				if (remoteBuilders[name] < minimumRemoteBuilders[name]) {
+					var nameful = eachSpawn.createCreep(workerBody[name], newRemoteBuilderName, {role: 'spawnBuilder', spawnedBy: name});
+					console.log(name + ' is making a ' + nameful);
+				}
 			}
-			if (remoteRepairers[name] < minimumRemoteRepairers[name]) {
-				var nameful = eachSpawn.createCreep(workerBody[name], newRemoteRepairerName, {role: 'remoteRepairer', spawnedBy: name});
-				console.log(name + ' is making a ' + nameful);
-			}
-			if (remoteBuilders[name] < minimumRemoteBuilders[name]) {
-				var nameful = eachSpawn.createCreep(workerBody[name], newRemoteBuilderName, {role: 'spawnBuilder', spawnedBy: name});
-				console.log(name + ' is making a ' + nameful);
-			}
-		}
 			//	Handle the conditions for spawning a third upgrader, else handle the conditions for spawning an upgrader
 			if(repairers[name] > 0 && builders[name] > 0 && miners[name] > 2 && carriers[name] > 2 && upgraders[name] < 3) {
 				if(upgraders[name] < minimumUpgraders[name]) {
