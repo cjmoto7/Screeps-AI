@@ -10,8 +10,6 @@ ScreepsAutocomplete/
 .tern-project
 test/ScreepsAutocomplete/
 test/.tern-project
-src/ScreepsAutocomplete/
-src/.tern-project
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
