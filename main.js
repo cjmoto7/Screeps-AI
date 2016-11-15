@@ -183,8 +183,8 @@ module.exports.loop = function () {
 
 	//	Desired population count amongst spawns
 	var minimumHarvesters = {Spawn1: 1, Spawn2: 1};
-	var minimumMiners = {Spawn1: 4, Spawn2: 4};
-	var minimumRemoteMiners = {Spawn1: 1, Spawn2: 0};
+	var minimumMiners = {Spawn1: 3, Spawn2: 3};
+	var minimumRemoteMiners = {Spawn1: 1, Spawn2: 1};
 	var minimumCarriers = {Spawn1: miners.Spawn1 + 1, Spawn2: miners.Spawn2 + 1};
 	var minimumRemoteCarriers = {Spawn1: remoteMiners.Spawn1 + 2, Spawn2: remoteMiners.Spawn2 + 3};
 	var minimumUpgraders = {Spawn1: 3, Spawn2: 3};
@@ -345,13 +345,13 @@ module.exports.loop = function () {
 				console.log(name + ' is making a ' + nameful);
 			}
 		}
-		else if(totalSappingCreeps[name] > 3 && miners[name] < 3) {
+		else if(totalSappingCreeps[name] > 3 && miners[name] < 3 && miners[name] > 1) {
 			if(miners[name] < minimumMiners[name]) {
 				var nameful = eachSpawn.createCreep(minerBody[name], newMinerName, {role: 'miner', spawnedBy: name});
 				console.log(name + ' is making a ' + nameful);
 			}
 		}
-		else if(totalSappingCreeps[name] > 5 && miners[name] < 4) {
+		else if(totalSappingCreeps[name] > 5 && miners[name] < 4 && miners[name] > 2) {
 			if(miners[name] < minimumMiners[name]) {
 				var nameful = eachSpawn.createCreep(minerBody[name], newMinerName, {role: 'miner', spawnedBy: name});
 				console.log(name + ' is making a ' + nameful);
